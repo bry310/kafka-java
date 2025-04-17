@@ -22,8 +22,13 @@ public class Main {
        clientSocket = serverSocket.accept();
 
        OutputStream out = clientSocket.getOutputStream();
-       out.write(new byte[] {0, 0, 0, 0});  // message_size:
-       out.write(new byte[] {0, 0, 0, 7});  // correlation_id: 7
+       KafkaRespanseMessage kafkaRespanseMessage = new KafkaRespanseMessage(
+               new byte[] {0, 0, 0, 0},
+               new byte[] {0, 0, 0, 7}
+       );
+
+         out.write(kafkaRespanseMessage.message_size());
+         out.write(kafkaRespanseMessage.correlation_id());
      } catch (IOException e) {
        System.out.println("IOException: " + e.getMessage());
      } finally {
