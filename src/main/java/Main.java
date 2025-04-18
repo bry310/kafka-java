@@ -1,7 +1,9 @@
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 
 public class Main {
   public static void main(String[] args){
@@ -22,13 +24,20 @@ public class Main {
        clientSocket = serverSocket.accept();
 
        OutputStream out = clientSocket.getOutputStream();
+       InputStream in = clientSocket.getInputStream();
+
+       var message_size = in.readNBytes(4);
+       var request_api_key = in.readNBytes(2);
+       var request_api_version = in.readNBytes(2);
+       var correlation_id = in.readNBytes(4);
        KafkaRespanseMessage kafkaRespanseMessage = new KafkaRespanseMessage(
-               new byte[] {0, 0, 0, 0},
-               new byte[] {0, 0, 0, 7}
+               message_size,
+               correlation_id
        );
 
-         out.write(kafkaRespanseMessage.message_size());
-         out.write(kafkaRespanseMessage.correlation_id());
+
+       out.write(kafkaRespanseMessage.message_size());
+       out.write(kafkaRespanseMessage.correlation_id());
      } catch (IOException e) {
        System.out.println("IOException: " + e.getMessage());
      } finally {
